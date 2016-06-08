@@ -47,9 +47,9 @@ if (url.protocol !== 'coap:' || !url.hostname) {
 
 req = request(url).on('response', function(res) {
   // print only status code on empty response
-  if (!res.payload.length && !program.quiet)
-    process.stderr.write('\x1b[1m(' + res.code + ')\x1b[0m\n')
-    
+  if (!res.payload.length && !program.quiet) {
+    process.stderr.write('\x1b[1m(' + res.code + ":" + res.payload + "::" + res.options['Content-Format'] + ')\x1b[0m\n')
+  }
     
     if (program.cbor){
       var d = new cbor.Decoder();
@@ -63,7 +63,7 @@ req = request(url).on('response', function(res) {
    {
       res.pipe(through(function addNewLine(chunk, enc, callback) {
         if (!program.quiet)
-          process.stderr.write('\x1b[1m(' + res.code + ')\x1b[0m\t')
+          process.stderr.write('\x1b[1m(' + res.code + ":" + res.payload + "::" + res.options['Content-Format'] + ')\x1b[0m\t')
         if (program.newLine && chunk)
           chunk = chunk.toString('utf-8') + '\n'
         
@@ -85,7 +85,7 @@ if (method === 'GET' || method === 'DELETE' || program.payload) {
   return
 }
 
-if (program.cbor) {
+if (program.cbor && process.stdin.read() === null) {
   var e = new cbor.Encoder();
   process.stdin.pipe(e).pipe(req)
 } else {
