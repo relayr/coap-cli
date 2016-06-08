@@ -17,7 +17,7 @@ program
   .option('-p, --payload <payload>', 'The payload for POST and PUT requests')
   .option('-q, --quiet', 'Do not print status codes of received packets', 'boolean', false)
   .option('-c, --non-confirmable', 'non-confirmable', 'boolean', false)
-  .option('-x, --cbor', 'Encode/decode the payload with CBOR', 'boolean', true)
+  .option('-x, --cbor', 'Encode/decode the payload with CBOR', 'boolean', false)
   .usage('[command] [options] url')
 
 
@@ -63,15 +63,16 @@ req = request(url).on('response', function(res) {
    } else
    {
       console.log("cbor is off")
-      res.pipe(through(function addNewLine(chunk, enc, callback) {
-        if (!program.quiet)
-          process.stderr.write('\x1b[1m(' + res.code + ')\x1b[0m\t')
-        if (program.newLine && chunk)
-          chunk = chunk.toString('utf-8') + '\n'
+      // res.pipe(through(function addNewLine(chunk, enc, callback) {
+      //   if (!program.quiet)
+      //     process.stderr.write('\x1b[1m(' + res.code + ')\x1b[0m\t')
+      //   if (program.newLine && chunk)
+      //     chunk = chunk.toString('utf-8') + '\n'
         
-        this.push(chunk)
-        callback()
-      })).pipe(process.stdout)
+      //   this.push(chunk)
+      //   callback()
+      // })).pipe(process.stdout)
+      res.pipe(process.stdout);
   }
   // needed because of some weird issue with
   // empty responses and streams
