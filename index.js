@@ -55,7 +55,7 @@ req = request(url).on('response', function(res) {
       console.log("cbor is on")
       var d = new cbor.Decoder();
       
-      d.on('complete', function(obj){
+      d.on('data', function(obj){
         console.log(util.inspect(obj,{ depth: null }));
       });
       
