@@ -52,6 +52,7 @@ req = request(url).on('response', function(res) {
   }
     
     if (program.cbor){
+      process.stderr.write('\x1b[1m(' + res.code + ":" + res.payload + "::" + res.options['Content-Format'] + ')\x1b[0m\n')
       var d = new cbor.Decoder();
       
       d.on('data', function(obj){
@@ -63,7 +64,7 @@ req = request(url).on('response', function(res) {
    {
       res.pipe(through(function addNewLine(chunk, enc, callback) {
         if (!program.quiet)
-          process.stderr.write('\x1b[1m(' + res.code + ":" + res.payload + "::" + res.options['Content-Format'] + ')\x1b[0m\t')
+          process.stderr.write('\x1b[1m(' + res.code + ')\x1b[0m\t')
         if (program.newLine && chunk)
           chunk = chunk.toString('utf-8') + '\n'
         
