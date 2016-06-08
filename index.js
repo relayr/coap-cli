@@ -52,22 +52,23 @@ req = request(url).on('response', function(res) {
     
     
     if (program.cbor){   
+      console.log("cbor is on")
       var d = new cbor.Decoder();
-  
+      
       d.on('complete', function(obj){
         console.log(util.inspect(obj,{ depth: null }));
       });
-    
+      
       res.pipe(d);
    } else
    {
-  
+      console.log("cbor is off")
       res.pipe(through(function addNewLine(chunk, enc, callback) {
         if (!program.quiet)
           process.stderr.write('\x1b[1m(' + res.code + ')\x1b[0m\t')
         if (program.newLine && chunk)
           chunk = chunk.toString('utf-8') + '\n'
-    
+        
         this.push(chunk)
         callback()
       })).pipe(process.stdout)
