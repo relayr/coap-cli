@@ -51,8 +51,7 @@ req = request(url).on('response', function(res) {
     process.stderr.write('\x1b[1m(' + res.code + ')\x1b[0m\n')
     
     
-    if (program.cbor){   
-      console.log("cbor is on")
+    if (program.cbor){
       var d = new cbor.Decoder();
       
       d.on('data', function(obj){
@@ -62,17 +61,15 @@ req = request(url).on('response', function(res) {
       res.pipe(d);
    } else
    {
-      console.log("cbor is off")
-      // res.pipe(through(function addNewLine(chunk, enc, callback) {
-      //   if (!program.quiet)
-      //     process.stderr.write('\x1b[1m(' + res.code + ')\x1b[0m\t')
-      //   if (program.newLine && chunk)
-      //     chunk = chunk.toString('utf-8') + '\n'
+      res.pipe(through(function addNewLine(chunk, enc, callback) {
+        if (!program.quiet)
+          process.stderr.write('\x1b[1m(' + res.code + ')\x1b[0m\t')
+        if (program.newLine && chunk)
+          chunk = chunk.toString('utf-8') + '\n'
         
-      //   this.push(chunk)
-      //   callback()
-      // })).pipe(process.stdout)
-      res.pipe(process.stdout);
+        this.push(chunk)
+        callback()
+      })).pipe(process.stdout)
   }
   // needed because of some weird issue with
   // empty responses and streams
