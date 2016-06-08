@@ -48,11 +48,11 @@ if (url.protocol !== 'coap:' || !url.hostname) {
 req = request(url).on('response', function(res) {
   // print only status code on empty response
   if (!res.payload.length && !program.quiet) {
-    process.stderr.write('\x1b[1m(' + res.code + ":" + res.payload + "::" + res.options + ')\x1b[0m\n')
+    process.stderr.write('\x1b[1m(' + res.code + ":" + res.payload + "::" + util.inspect(res.options,{ depth: null }) + ')\x1b[0m\n')
   }
     
     if (program.cbor){
-      process.stderr.write('\x1b[1m(' + res.code + ')\x1b[0m\n')
+      process.stderr.write('\x1b[1m(' + res.code + ':' + util.inspect(res.options,{ depth: null }) + ')\x1b[0m\n')
       var d = new cbor.Decoder();
       
       d.on('data', function(obj){
