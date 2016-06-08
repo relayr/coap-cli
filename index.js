@@ -48,7 +48,7 @@ if (url.protocol !== 'coap:' || !url.hostname) {
 req = request(url).on('response', function(res) {
   // print only status code on empty response
   if (!res.payload.length && !program.quiet) {
-    process.stderr.write('\x1b[1m(' + res.code + ":" + res.payload + "::" + res.options['Content-Format'] + ')\x1b[0m\n')
+    process.stderr.write('\x1b[1m(' + res.code + ":" + res.payload + "::" + res.options + ')\x1b[0m\n')
   }
     
     if (program.cbor){
