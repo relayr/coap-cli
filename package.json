@@ -37,6 +37,7 @@
   "dependencies": {
     "coap": "Zone-Ghost/node-coap",
     "commander": "~2.9.0",
-    "through2": "~2.0.0"
+    "through2": "~2.0.0",
+    "cbor": "~1.0.4"
   }
 }
