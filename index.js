@@ -52,7 +52,7 @@ req = request(url).on('response', function(res) {
   }
     
     if (program.cbor){
-      process.stderr.write('\x1b[1m(' + res.code + ":" + res.payload + "::" + res.options['Content-Format'] + ')\x1b[0m\n')
+      process.stderr.write('\x1b[1m(' + res.code + ')\x1b[0m\n')
       var d = new cbor.Decoder();
       
       d.on('data', function(obj){
