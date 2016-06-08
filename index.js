@@ -7,6 +7,8 @@ var program = require('commander')
   , through = require('through2')
   , method  = 'GET' // default
   , url
+  , util = require('util')
+  , cbor = require('cbor')
 
 program
   .version(version)
@@ -15,6 +17,7 @@ program
   .option('-p, --payload <payload>', 'The payload for POST and PUT requests')
   .option('-q, --quiet', 'Do not print status codes of received packets', 'boolean', false)
   .option('-c, --non-confirmable', 'non-confirmable', 'boolean', false)
+  .option('-x, --cbor', 'Encode/decode the payload with CBOR', 'boolean', true)
   .usage('[command] [options] url')
 
 
@@ -46,17 +49,29 @@ req = request(url).on('response', function(res) {
   // print only status code on empty response
   if (!res.payload.length && !program.quiet)
     process.stderr.write('\x1b[1m(' + res.code + ')\x1b[0m\n')
-
-  res.pipe(through(function addNewLine(chunk, enc, callback) {
-    if (!program.quiet)
-      process.stderr.write('\x1b[1m(' + res.code + ')\x1b[0m\t')
-    if (program.newLine && chunk)
-      chunk = chunk.toString('utf-8') + '\n'
-
-    this.push(chunk)
-    callback()
-  })).pipe(process.stdout)
-
+    
+    
+    if (program.cbor){   
+      var d = new cbor.Decoder();
+  
+      d.on('complete', function(obj){
+        console.log(util.inspect(obj,{ depth: null }));
+      });
+    
+      res.pipe(d);
+   } else
+   {
+  
+      res.pipe(through(function addNewLine(chunk, enc, callback) {
+        if (!program.quiet)
+          process.stderr.write('\x1b[1m(' + res.code + ')\x1b[0m\t')
+        if (program.newLine && chunk)
+          chunk = chunk.toString('utf-8') + '\n'
+    
+        this.push(chunk)
+        callback()
+      })).pipe(process.stdout)
+  }
   // needed because of some weird issue with
   // empty responses and streams
   if (!res.payload.length)
@@ -64,8 +79,16 @@ req = request(url).on('response', function(res) {
 })
 
 if (method === 'GET' || method === 'DELETE' || program.payload) {
-  req.end(program.payload)
+  if (program.cbor)
+    req.end(cbor.encode(program.payload))
+  else 
+    req.end(program.payload);
   return
 }
 
-process.stdin.pipe(req)
+if (program.cbor) {
+  var e = new cbor.Encoder();
+  process.stdin.pipe(e).pipe(req)
+} else {
+  process.stdin.pipe(req)
+}
