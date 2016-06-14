@@ -82,11 +82,12 @@ req = request(url).on('response', function(res) {
 })
 
 if (method === 'GET' || method === 'DELETE' || program.payload) {
-  if (program.cbor)
+  if (program.cbor && program.payload)
     req.end(cbor.encode(program.payload))
   else 
     req.end(program.payload);
   return
+  
 }
 
 if (program.cbor && process.stdin.read() === null) {
