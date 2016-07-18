@@ -7,7 +7,6 @@
     "test": "mocha --bail --reporter spec --check-leaks"
   },
   "pre-commit": [
-    "test"
   ],
   "bin": {
     "coap": "index.js"
@@ -35,7 +34,7 @@
     "event-stream": "~3.3.2"
   },
   "dependencies": {
-    "coap": "0.16.0",
+    "node-coap": "datasnap-io/node-coap",
     "commander": "~2.9.0",
     "through2": "~2.0.0",
     "cbor": "~1.0.4"
