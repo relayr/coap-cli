@@ -13,7 +13,9 @@ const fs      = require('fs');
 
 
 var readAndWrapDER = function(path) {
-  return fs.readFileSync(path);
+  var return_value = false;
+  return_value = fs.readFileSync(path);
+  return return_value;
 }
 
 var psk = function(val) {
@@ -30,11 +32,11 @@ program
   .option('-q, --quiet', 'Do not print status codes of received packets', 'boolean', false)
   .option('-c, --non-confirmable', 'non-confirmable', 'boolean', false)
   .option('-x, --cbor', 'Encode/decode the payload with CBOR', 'boolean', false)
-  .option('    --cacert', 'Path to a DER-encoded CA certificate (if that matters).', 'cacert')
-  .option('    --cpcert', 'Path to a DER-encoded certificate representing the counterparty\'s identity.', 'cpcert')
-  .option('    --ourcert', 'Path to a DER-encoded certificate representing our identity.', 'ourcert')
-  .option('    --psk [value]', 'A base64-encoded pre-shared key.', 'psk')
-  .option('    --pskident [value]', 'A PSK representing our identity.', 'pskident')
+  .option('    --cacert', 'Path to a DER-encoded CA certificate (if that matters).', false)
+  .option('    --cpcert', 'Path to a DER-encoded certificate representing the counterparty\'s identity.', false)
+  .option('    --ourcert', 'Path to a DER-encoded certificate representing our identity.', false)
+  .option('    --psk [value]', 'A base64-encoded pre-shared key.', false)
+  .option('    --pskident [value]', 'A PSK representing our identity.', false)
   .usage('[command] [options] url')
 
 
@@ -63,17 +65,56 @@ if (!url.hostname) {
   process.exit(-1)
 }
 
-var dtls_opts = undefined;
+var dtls_opts = false;
+var ident_supplied = false;
 
 switch (url.protocol) {
   case 'coaps:':
     /* Now we look for DTLS-related options... */
     dtls_opts = {};
-    if (program.cacert) dtls_opts.CACert        = readAndWrapDER(program.cacert);
-    if (program.cpcert) dtls_opts.peerPublicKey = readAndWrapDER(program.cpcert);
-    if (program.ourcert) dtls_opts.key          = readAndWrapDER(program.ourcert);
-    if (program.psk) dtls_opts.psk              = new Buffer(program.psk.toString());
-    if (program.pskident) dtls_opts.PSKIdent    = new Buffer(program.pskident.toString());
+    // Error-checking params....
+
+    if ((program.psk) || (program.pskident)) {
+      if (!((program.psk) && (program.pskident))) {
+        // If we have one thing, and not the other, we will fail.
+        console.log('You must supply BOTH psk and pskident if you supply either. Failing...');
+        process.exit(-1);
+      }
+      else {
+        dtls_opts.psk      = new Buffer(program.psk.toString());
+        dtls_opts.PSKIdent = new Buffer(program.pskident.toString());
+        ident_supplied = true;   // Sufficient definition of identity.
+      }
+    }
+    else {
+      // TODO: Disqualify all PSK ciphersuites.
+    }
+
+    // Prepping the pass-in to node-coap...
+    if (program.cacert) {
+      var _temp = readAndWrapDER(program.cacert);
+      if (typeof _temp === 'Buffer') dtls_opts.CACert = _temp;
+    }
+    if (program.cpcert) {
+      var _temp = readAndWrapDER(program.cpcert);
+      if (typeof _temp === 'Buffer') {
+        dtls_opts.peerPublicKey = _temp;
+        ident_supplied = true;   // Sufficient definition of identity.
+      }
+    }
+    if (program.ourcert) {
+      var _temp = readAndWrapDER(program.ourcert);
+      if (typeof _temp === 'Buffer') {
+        dtls_opts.key = _temp;
+        ident_supplied = true;   // Sufficient definition of identity.
+      }
+    }
+
+    if (!ident_supplied) {
+      console.log('DTLS was desired, but insufficient identity information was given. Failing...')
+      process.exit(-1)
+    }
+
   case 'coap:':
     break;
   default:
@@ -81,7 +122,6 @@ switch (url.protocol) {
     process.exit(-1)
     break;
 }
-
 
 
 req = request(url, dtls_opts, (req) => {

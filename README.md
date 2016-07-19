@@ -44,6 +44,11 @@ Usage
     -p, --payload <payload>  The payload for POST and PUT requests
     -q, --quiet              Do not print status codes of received packets
     -c, --non-confirmable    non-confirmable
+        --cacert             Path to a DER-encoded CA certificate (if that matters).
+        --cpcert             Path to a DER-encoded certificate representing the counterparty's identity.
+        --ourcert            Path to a DER-encoded certificate representing our identity.
+        --psk [value]        A base64-encoded pre-shared key.
+        --pskident [value]   A PSK representing our identity.
 ```
 
 ### PUT and POST
@@ -56,6 +61,20 @@ echo -n 'hello world' | coap post coap://localhost/message
 
 If you want to type it you can end the standard input by pressing
 CTRL-D.
+
+
+Generating yourself a DER-format cert
+----------------------------
+If you want to use an authenticated DTLS ciphersuite, you will need keys encoded in DER format.
+To make those with openSSL....
+
+    openssl ecparam -genkey -name secp256k1 -out server.pem
+    openssl ecparam -genkey -name secp256k1 -out client.pem
+    openssl rsa -in server.pem -pubout -outform DER -out server.der
+    openssl pkcs8 -topk8 -inform PEM -outform DER -in server.pem -out server.der -nocrypt
+    openssl rsa -in client.pem -pubout -outform DER -out client.der
+    openssl pkcs8 -topk8 -inform PEM -outform DER -in client.pem -out client.der -nocrypt
+
 
 License
 ----------------------------
