@@ -34,7 +34,7 @@
     "event-stream": "~3.3.2"
   },
   "dependencies": {
-    "node-coap" : "git://github.com/datasnap-io/node-coap",
+    "coap": "github:datasnap-io/node-coap",
     "commander": "~2.9.0",
     "through2": "~2.0.0",
     "cbor": "~1.0.4"

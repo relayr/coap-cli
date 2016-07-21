@@ -2,7 +2,7 @@
 
 var program = require('commander')
   , version = require('./package').version
-  , request = require('node-coap').request
+  , request = require('coap').request
   , URL     = require('url')
   , through = require('through2')
   , method  = 'GET' // default
