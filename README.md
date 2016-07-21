@@ -1,20 +1,21 @@
-CoAP-CLI
+## coap-cli
+=====
+
+This is datasnap's fork of coap-cli. It has been extended to use DTLS.
+
 ============================
 
-[![Build
-Status](https://travis-ci.org/mcollina/coap-cli.png)](https://travis-ci.org/mcollina/coap-cli)
-
 __CoAP-CLI__ is a command line interface for CoAP, built on node.js and
-[node-coap](http://github.com/mcollina/node-coap).
+[node-coap](http://github.com/datasnap-io/node-coap).
 
-What is CoAP?
+### What is CoAP?
 ----------------------------
 
 > Constrained Application Protocol (CoAP) is a software protocol
 intended to be used in very simple electronics devices that allows them
 to communicate interactively over the Internet. -  Wikipedia
 
-Install
+### Install
 ----------------------------
 
 Install [node.js](http://nodejs.org), and then from a terminal:
@@ -22,7 +23,7 @@ Install [node.js](http://nodejs.org), and then from a terminal:
 npm install coap-cli -g
 ```
 
-Usage
+### Usage
 ----------------------------
 
 ```
@@ -63,7 +64,16 @@ If you want to type it you can end the standard input by pressing
 CTRL-D.
 
 
-Generating yourself a DER-format cert
+### DTLS Extension
+----------------------------
+"coaps" in the URI implies DTLS. If the port is left unspecified, it will default to 5684.
+
+DTLS as I've implemented it requires some sort of identity to be passed as command-line args. This can either be PSK, or a path to a DER-encoded cert.
+
+There is some reasonable error-reporting in place to catch conditions of "insufficient supplied identity", but not all ciphersuites are implemented in node-mbed-dtls. Where parameter space overlaps, the supported ciphersuites can be enabled by changing the conf file in node-mbed-dtls, and performing a gyp rebuild.
+
+
+### Generating yourself a DER-format cert
 ----------------------------
 If you want to use an authenticated DTLS ciphersuite, you will need keys encoded in DER format.
 To make those with openSSL....
@@ -76,7 +86,7 @@ To make those with openSSL....
     openssl pkcs8 -topk8 -inform PEM -outform DER -in client.pem -out client.der -nocrypt
 
 
-License
+### License
 ----------------------------
 
 Copyright (c) 2013 Matteo Collina
@@ -84,3 +94,6 @@ Copyright (c) 2013 Matteo Collina
 node-coap is licensed under an MIT +no-false-attribs license.
 All rights not explicitly granted in the MIT license are reserved.
 See the included LICENSE file for more details.
+
+
+DTLS extensions performed by J. Ian Lindsay
