@@ -15,6 +15,7 @@ const fs      = require('fs');
 var readAndWrapDER = function(path) {
   var return_value = false;
   return_value = fs.readFileSync(path);
+  return_value = new Buffer(return_value.toString())
   return return_value;
 }
 
@@ -32,9 +33,9 @@ program
   .option('-q, --quiet', 'Do not print status codes of received packets', 'boolean', false)
   .option('-c, --non-confirmable', 'non-confirmable', 'boolean', false)
   .option('-x, --cbor', 'Encode/decode the payload with CBOR', 'boolean', false)
-  .option('    --cacert', 'Path to a DER-encoded CA certificate (if that matters).', false)
-  .option('    --cpcert', 'Path to a DER-encoded certificate representing the counterparty\'s identity.', false)
-  .option('    --ourcert', 'Path to a DER-encoded certificate representing our identity.', false)
+  .option('    --cacert [path]', 'Path to a DER-encoded CA certificate (if that matters).', false)
+  .option('    --cpcert [path]', 'Path to a DER-encoded certificate representing the counterparty\'s identity.', false)
+  .option('    --ourcert [path]', 'Path to a DER-encoded certificate representing our identity.', false)
   .option('    --psk [value]', 'A base64-encoded pre-shared key.', false)
   .option('    --pskident [value]', 'A PSK representing our identity.', false)
   .usage('[command] [options] url')
@@ -92,19 +93,19 @@ switch (url.protocol) {
 
     // Prepping the pass-in to node-coap...
     if (program.cacert) {
-      var _temp = readAndWrapDER(program.cacert);
-      if (typeof _temp === 'Buffer') dtls_opts.CACert = _temp;
+      var _temp = readAndWrapDER(program.cacert.toString());
+      if (Buffer.isBuffer(_temp)) dtls_opts.CACert = _temp;
     }
     if (program.cpcert) {
-      var _temp = readAndWrapDER(program.cpcert);
-      if (typeof _temp === 'Buffer') {
+      var _temp = readAndWrapDER(program.cpcert.toString());
+      if (Buffer.isBuffer(_temp)) {
         dtls_opts.peerPublicKey = _temp;
         ident_supplied = true;   // Sufficient definition of identity.
       }
     }
     if (program.ourcert) {
-      var _temp = readAndWrapDER(program.ourcert);
-      if (typeof _temp === 'Buffer') {
+      var _temp = readAndWrapDER(program.ourcert.toString());
+      if (Buffer.isBuffer(_temp)) {
         dtls_opts.key = _temp;
         ident_supplied = true;   // Sufficient definition of identity.
       }
