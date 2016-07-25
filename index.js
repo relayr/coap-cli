@@ -126,19 +126,19 @@ switch (url.protocol) {
 
 
 req = request(url, dtls_opts, (req) => {
-  req.on('response', function(res) {
+  req.on('response', (res) => {
     // print only status code on empty response
     if (!res.payload.length && !program.quiet) {
       process.stderr.write('\x1b[1m(' + res.code + ')\x1b[0m\n')
     }
-    
+
     if (program.cbor) {
       var d = new cbor.Decoder();
-      
+
       d.on('data', function(obj){
         console.log(util.inspect(obj,{ depth: null }));
       });
-      
+
       res.pipe(d);
     }
     else {
@@ -149,7 +149,7 @@ req = request(url, dtls_opts, (req) => {
         if (program.newLine && chunk) {
           chunk = chunk.toString('utf-8') + '\n'
         }
-        
+
         this.push(chunk)
         callback()
       })).pipe(process.stdout)
