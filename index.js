@@ -50,7 +50,7 @@ program
 
 program.parse(process.argv)
 
-if (!program.args[0]) {
+if (!program.args[0] || ('string' !== typeof program.args[0])) {
   program.outputHelp()
   process.exit(-1)
 }
