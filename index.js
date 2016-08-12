@@ -160,12 +160,6 @@ req = request(url, dtls_opts, (req) => {
 
 
     if (method === 'GET' || method === 'DELETE' || program.payload) {
-      if (program.cbor) {
-        req.end(cbor.encode(program.payload));
-      }
-      else {
-        req.end(program.payload);
-      }
       return
     }
 
@@ -177,4 +171,12 @@ req = request(url, dtls_opts, (req) => {
       process.stdin.pipe(req)
     }
   });
+
+
+      if (program.cbor) {
+        req.end(cbor.encode(program.payload));
+      }
+      else {
+        req.end(program.payload);
+      }
 });
