@@ -128,18 +128,24 @@ switch (url.protocol) {
 req = request(url, dtls_opts, (req) => {
   req.on('response', (res) => {
     // print only status code on empty response
-    if (!res.payload.length && !program.quiet) {
-      process.stderr.write('\x1b[1m(' + res.code + ')\x1b[0m\n')
+    if (!res.payload.length) {
+      if (!program.quiet) {
+        process.stderr.write('\x1b[1m(' + res.code + ')\x1b[0m\n')
+      }
+      process.exit(0);
     }
 
     if (program.cbor) {
-      var d = new cbor.Decoder();
-
-      d.on('data', function(obj){
-        console.log(util.inspect(obj,{ depth: null }));
+      cbor.decodeFirst(res.payload, (err, obj) => {
+        if (err != null) {
+          console.log(err);
+          process.exit(0);
+        }
+        else {
+          console.log(`${res.code}: ${JSON.stringify(obj)}`);
+          process.exit(0);
+        }
       });
-
-      res.pipe(d);
     }
     else {
       res.pipe(through(function addNewLine(chunk, enc, callback) {
@@ -152,31 +158,25 @@ req = request(url, dtls_opts, (req) => {
 
         this.push(chunk)
         callback()
+        process.exit(0);
       })).pipe(process.stdout)
     }
-    // needed because of some weird issue with
-    // empty responses and streams
-    if (!res.payload.length) process.exit(0)
 
-
-    if (method === 'GET' || method === 'DELETE' || program.payload) {
-      return
-    }
-
-    if (program.cbor) {
-      var e = new cbor.Encoder();
-      process.stdin.pipe(e).pipe(req)
-    }
-    else {
-      process.stdin.pipe(req)
-    }
+    //if (method === 'GET' || method === 'DELETE' || program.payload) {
+      //return
+    //}
   });
 
 
-      if (program.cbor) {
-        req.end(cbor.encode(program.payload));
-      }
-      else {
-        req.end(program.payload);
-      }
+  if (program.payload) {
+    if (program.cbor) {
+      req.end(cbor.encode(program.payload));
+    }
+    else {
+      req.end(program.payload);
+    }
+  }
+  else {
+    req.end();
+  }
 });
