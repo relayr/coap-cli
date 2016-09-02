@@ -20,7 +20,7 @@ to communicate interactively over the Internet. -  Wikipedia
 
 Install [node.js](http://nodejs.org), and then from a terminal:
 ```
-npm install coap-cli -g
+npm install datasnap-io/coap-cli -g
 ```
 
 ### Usage
