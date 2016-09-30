@@ -13,7 +13,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/datasnap-io/coap-cli.git"
+    "url": "https://github.com/neustar/coap-cli.git"
   },
   "keywords": [
     "coap",
@@ -34,7 +34,7 @@
     "event-stream": "~3.3.2"
   },
   "dependencies": {
-    "coap": "git+https://github.com/datasnap-io/node-coap",
+    "coap": "git+https://github.com/neustar/node-coap",
     "commander": "~2.9.0",
     "through2": "~2.0.0",
     "cbor": "~1.0.4"
