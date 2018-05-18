@@ -2,7 +2,7 @@
 
 var program = require('commander')
   , version = require('./package').version
-  , request = require('coap').request
+  , request = require('coap-dtls').request
   , URL     = require('url')
   , through = require('through2')
   , method  = 'GET' // default
